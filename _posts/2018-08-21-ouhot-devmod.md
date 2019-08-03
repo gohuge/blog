@@ -2,6 +2,7 @@
 layout: post
 title: "【ouhot】开发模型"
 date: 2018-08-21 16:05:57
+img: ouhot_gl.png
 category: ouhot
 tags: [ouhot]
 ---

@@ -2,6 +2,7 @@
 layout: post
 title: "【ouhot】架构建议"
 date: 2018-08-21 16:10:57
+img: ouhot_gl.png
 category: ouhot
 tags: [ouhot]
 ---

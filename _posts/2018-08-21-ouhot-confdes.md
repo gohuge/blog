@@ -2,6 +2,7 @@
 layout: post
 title: "【ouhot】配置说明"
 date: 2018-08-21 16:15:57
+img: ouhot_gl.png
 category: ouhot
 tags: [ouhot]
 ---

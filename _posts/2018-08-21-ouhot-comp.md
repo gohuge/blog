@@ -2,6 +2,7 @@
 layout: post
 title: "【ouhot】组件说明"
 date: 2018-08-21 11:05:57
+img: ouhot_gl.png
 category: ouhot
 tags: [ouhot]
 ---

@@ -2,6 +2,7 @@
 layout: post
 title: "【ouhot】集群介绍"
 date: 2018-08-16 13:47:57
+img: ouhot_gl.png
 category: ouhot
 tags: [ouhot]
 ---
