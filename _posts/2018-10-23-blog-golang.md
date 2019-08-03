@@ -2,8 +2,9 @@
 layout: post
 title: "Golang测试用例怎么写"
 date: 2018-10-22 13:46:57
-category: firedog
-tags: [firedog]
+img: how-to-start.jpg
+category: golang
+tags: [golang]
 ---
 
 #### 11.3 Go怎么写测试用例

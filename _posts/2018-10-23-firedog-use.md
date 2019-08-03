@@ -2,6 +2,7 @@
 layout: post
 title: "FireDog使用说明"
 date: 2018-10-22 13:46:57
+img: we-in-rest.jpg
 category: firedog
 tags: [firedog]
 ---

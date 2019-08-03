@@ -2,6 +2,7 @@
 layout: post
 title: "为什么我们迫切需要持续集成"
 date: 2018-10-22 13:47:57
+img: mac.jpg
 category: blog
 tags: [blog]
 ---

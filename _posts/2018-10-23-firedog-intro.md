@@ -3,7 +3,7 @@ layout: post
 title: FireDog介绍
 date: 2018-10-22 13:47:57
 description: You’ll find this post in your
-img: software.jpg
+img: workflow.jpg 
 category: firedog
 tags: [firedog]
 ---

@@ -3,7 +3,7 @@ layout: post
 title: 【ouhot】设计图
 date: 2018-11-07 13:47:57
 description: 设计图
-img: i-rest.jpg # Add image post (optional)
+img: js-1.png
 category: ouhot
 tags: [ouhot]
 ---
