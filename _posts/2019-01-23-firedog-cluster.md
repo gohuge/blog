@@ -2,6 +2,7 @@
 layout: post
 title: "FireDog集群-节点和服务构建"
 date: 2018-1-23 13:46:57
+img: js-1.png
 category: firedog
 tags: [firedog]
 ---

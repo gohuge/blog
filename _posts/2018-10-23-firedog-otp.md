@@ -2,6 +2,7 @@
 layout: post
 title: "FireDog OTP"
 date: 2018-10-22 13:46:57
+img: js-1.png
 category: firedog
 tags: [firedog]
 ---

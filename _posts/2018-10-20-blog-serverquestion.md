@@ -2,6 +2,7 @@
 layout: post
 title: "服务器问题排查总结"
 date: 2018-10-20 13:47:57
+img: workflow.jpg 
 category: blog
 tags: [blog]
 ---

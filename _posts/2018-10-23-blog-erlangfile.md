@@ -2,7 +2,6 @@
 layout: post
 title: Erlang文件读取速度和压缩率
 date: 2018-10-23 13:47:57
-description: 文件读取
 img: software.jpg
 category: blog
 tags: [blog]

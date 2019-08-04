@@ -2,6 +2,7 @@
 layout: post
 title: "FireDog配置"
 date: 2018-10-22 13:46:57
+img: workflow.jpg 
 category: firedog
 tags: [firedog]
 ---

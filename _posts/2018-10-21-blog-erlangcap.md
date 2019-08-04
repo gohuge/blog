@@ -2,6 +2,7 @@
 layout: post
 title: "Erlang 容器性能测试"
 date: 2018-10-21 13:47:57
+img: workflow.jpg 
 category: blog
 tags: [blog]
 ---
