@@ -2,7 +2,7 @@
 layout: post
 title: HTTP和HTTPS那点事
 date: 2019-08-04 11:47:57
-img: js-1.jpg
+img: js-1.png
 category: blog
 tags: [blog]
 ---
