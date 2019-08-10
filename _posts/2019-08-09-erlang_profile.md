@@ -26,3 +26,10 @@ Erlang DETS和Memcached的性能基本一致。
 
 ## 修复Dets文件非常慢
 Dets文件的修复时间与文件中的记录数成正比，虽然Dets文件修复以前很慢，但是Dets的实现已被大量改写和改进。
+
+## 关于Protobuf
+用term_to_binary一个erlang元组，为375byte，通过protobuf进行encode只有85byte，所以
+- term_to_binary 的数据没压缩过不能直接通信，数据太大
+- protobuf作为erlang中间传输或者存数据库前的编码都很实用，降低了4倍左右的空间占用
+关于压缩率的问题这里有一篇文章
+https://cloud.tencent.com/developer/article/1005849
