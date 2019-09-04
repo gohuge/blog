@@ -18,6 +18,7 @@ Best HTTP|网络插件|它支持REST,WebSocket,Socket,IO比Unity原生的WWW强�
 Photon PUN|联机插件|多人联机插件，同时支持PC,手机，网页
 Obfuscator|代码安全|保护游戏代码和游戏资源，防止被逆向工程破解
 UFPS|轮子|第一人称设计游戏的必备插件，开发者无需重造轮子
+Shader Forge|编辑器|Shader可视化编辑器
 Lip Sync Pro|动画|制作唇语同步&面部动画的插件
 World Streamer|场景|场景管理插件，可用于制作无限大地图
 Terrain Slicing & Dynamic Loading Kit|场景|场景管理插件，用于切割地形和动态加载地形
@@ -41,3 +42,4 @@ Poco-SDK|测试|运行时组件识别，用于自动化测试
 ---|:--:|---:
 ToolGood.Words|文本|敏感词检测组件，开源
 LitJson|文本|支持嵌套的json库（Unity自带的不支持），开源
+Mikunyan|UnityAssert|Github开源的资源反编译rubhttps://github.com/Ishotihadus/mikunyan
