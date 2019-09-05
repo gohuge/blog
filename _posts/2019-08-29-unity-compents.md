@@ -43,3 +43,6 @@ Poco-SDK|测试|运行时组件识别，用于自动化测试
 ToolGood.Words|文本|敏感词检测组件，开源
 LitJson|文本|支持嵌套的json库（Unity自带的不支持），开源
 Mikunyan|UnityAssert|Github开源的资源反编译rubhttps://github.com/Ishotihadus/mikunyan
+
+## 插件宝典
+https://www.cnblogs.com/revoid/p/11257696.html
