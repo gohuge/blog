@@ -16,75 +16,81 @@ tags: [blog]
 
 ### 二、如何建立连接
 
-前面提到，WebSocket 复用了 HTTP 的握手通道。具体指的是，客户端通过 HTTP 请求与 WebSocket 服务端协商升级协议。协议升级完成后，后续的数据交换则遵照 WebSocket 的协议。
-
-1. 客户端：申请协议升级
-首先，客户端发起协议升级请求。可以看到，采用的是标准的 HTTP 报文格式，且只支持GET方法。
+** 握手实现 **
 
 ```
-GET / HTTP/1.1
-Host: localhost:8080
-Origin: http://127.0.0.1:3000
-Connection: Upgrade
+GET /chat HTTP/1.1
+Host: server.example.com
 Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
 Sec-WebSocket-Version: 13
-Sec-WebSocket-Key: w4v7O6xFTi36lq3RNcgctw==
-重点请求首部意义如下：
-
-Connection: Upgrade：表示要升级协议
-Upgrade: websocket：表示要升级到 websocket 协议。
-Sec-WebSocket-Version: 13：表示 websocket 的版本。如果服务端不支持该版本，需要返回一个Sec-WebSocket-Versionheader，里面包含服务端支持的版本号。
-Sec-WebSocket-Key：与后面服务端响应首部的Sec-WebSocket-Accept是配套的，提供基本的防护，比如恶意的连接，或者
-无意的连接。
-注意，上面请求省略了部分非重点请求首部。由于是标准的 HTTP 请求，类似 Host、Origin、Cookie 等请求首部会照常发送。在握手阶段，可以通过相关请求首部进行 安全限制、权限校验等。
+Origin: http://example.com
 ```
-2. 服务端：响应协议升级
-服务端返回内容如下，状态代码101表示协议切换。到此完成协议升级，后续的数据交互都按照新的协议来。
+告诉Apache、Nginx等服务器：注意啦，窝发起的是Websocket协议，快点帮我找到对应的助理处理;
+```
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+#首先，Sec-WebSocket-Key 是一个Base64 encode的值，这个是浏览器随机生成的
+ 告诉服务器：泥煤，不要忽悠窝，我要验证尼是不是真的是Websocket助理。
+
+Sec-WebSocket-Protocol: chat, superchat
+#Sec_WebSocket-Protocol 是一个用户定义的字符串，用来区分同URL下，不同的服务所需要的协议。
+  简单理解：今晚我要服务A，别搞错啦~
+Sec-WebSocket-Version: 13
+#Sec-WebSocket-Version 是告诉服务器所使用的Websocket Draft（协议版本）
+ 在最初的时候，Websocket协议还在 Draft 阶段，各种奇奇怪怪的协议都有
+
+```
+服务端响应
 
 ```
 HTTP/1.1 101 Switching Protocols
-Connection:Upgrade
+#这里开始就是HTTP最后负责的区域了，告诉客户，我已经成功切换协议啦~
+
 Upgrade: websocket
-Sec-WebSocket-Accept: Oy4NRAQ13jhfONC7bP8dTKb4PTU=
-备注：每个 header 都以\r\n结尾，并且最后一行加上一个额外的空行\r\n。此外，服务端回应的 HTTP 状态码只能在握手阶段使用。过了握手阶段后，就只能采用特定的错误码。
-```
-3. Sec-WebSocket-Accept 的计算
-Sec-WebSocket-Accept根据客户端请求首部的Sec-WebSocket-Key计算出来。
+Connection: Upgrade
+#告诉客户端即将升级的是Websocket协议，而不是mozillasocket，lurnarsocket或者shitsocket。
+Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
+#Sec-WebSocket-Accept 这个则是经过服务器确认，并且加密过后Sec-WebSocket-Key。
+#服务器：好啦好啦，知道啦，给你看我的ID CARD来证明行了吧。
 
-计算公式为：
-
-将Sec-WebSocket-Key跟258EAFA5-E914-47DA-95CA-C5AB0DC85B11拼接。
-通过 SHA1 计算出摘要，并转成 base64 字符串。
-伪代码如下：
+Sec-WebSocket-Protocol: chat
+#后面的，Sec-WebSocket-Protocol 则是表示最终使用的协议。
 ```
->toBase64( sha1( Sec-WebSocket-Key + 258EAFA5-E914-47DA-95CA-C5AB0DC85B11 ) )
-验证下前面的返回结果：
-
-const crypto = require('crypto');
-const magic = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-const secWebSocketKey = 'w4v7O6xFTi36lq3RNcgctw==';
-let secWebSocketAccept = crypto.createHash('sha1')
-    .update(secWebSocketKey + magic)
-    .digest('base64');
-console.log(secWebSocketAccept);
-// Oy4NRAQ13jhfONC7bP8dTKb4PTU=
+** 客户端连接报文 **
 ```
+<pre class="displaycode" style="margin-top: 0px; margin-bottom: 0px; white-space: pre-wrap; word-wrap: break-word; box-sizing: border-box;">GET /webfin/websocket/ HTTP/1.1
+Host: localhost
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: xqBt3ImNzJbYqRINxEFlkg==
+Origin: http://localhost:8080
+Sec-WebSocket-Version: 13</pre>
+```
+可以看到，客户端发起的 WebSocket 连接报文类似传统 HTTP 报文，”Upgrade：websocket”参数值表明这是 WebSocket 类型请求，“Sec-WebSocket-Key”是 WebSocket 客户端发送的一个 base64 编码的密文，要求服务端必须返回一个对应加密的“Sec-WebSocket-Accept”应答，否则客户端会抛出“Error during WebSocket handshake”错误，并关闭连接。
+
+服务端收到报文后返回的数据格式类似：
+
+** WebSocket 服务端响应报文 **
+
+```
+<pre class="displaycode" style="margin-top: 0px; margin-bottom: 0px; white-space: pre-wrap; word-wrap: break-word; box-sizing: border-box;">HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: K7DJLdLooIwIG/MOpvWFB3y3FE8=</pre>
+```
+“Sec-WebSocket-Accept”的值是服务端采用与客户端一致的密钥计算出来后返回客户端的,“HTTP/1.1 101 Switching Protocols”表示服务端接受 WebSocket 协议的客户端连接，经过这样的请求-响应处理后，客户端服务端的 WebSocket 连接握手成功, 后续就可以进行 TCP 通讯了。
 
 ### 三、数据帧格式
-
-客户端、服务端数据的交换，离不开数据帧格式的定义。因此，在实际讲解数据交换之前，我们先来看下 WebSocket 的数据帧格式。
 
 WebSocket 客户端、服务端通信的最小单位是帧（frame），由 1 个或多个帧组成一条完整的消息（message）。
 
 发送端：将消息切割成多个帧，并发送给服务端；
 接收端：接收消息帧，并将关联的帧重新组装成完整的消息；
-本节的重点，就是讲解数据帧的格式。详细定义可参考 RFC6455 5.2 节 。
 
 1. 数据帧格式概览
-下面给出了 WebSocket 数据帧的统一格式。熟悉 TCP/IP 协议的同学对这样的图应该不陌生。
 
-从左到右，单位是比特。比如FIN、RSV1各占据 1 比特，opcode占据 4 比特。
-内容包括了标识、操作代码、掩码、数据、数据长度等。（下一小节会展开）
 ```
   0                   1                   2                   3
   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -105,7 +111,9 @@ WebSocket 客户端、服务端通信的最小单位是帧（frame），由 1 �
  |                     Payload Data continued ...                |
  +---------------------------------------------------------------+
 ```
+
 2. 数据帧格式详解
+
 针对前面的格式概览图，这里逐个字段进行讲解，如有不清楚之处，可参考协议规范，或留言交流。
 
 FIN：1 个比特。
@@ -120,6 +128,7 @@ Opcode: 4 个比特。
 
 操作代码，Opcode 的值决定了应该如何解析后续的数据载荷（data payload）。如果操作代码是不认识的，那么接收端应该断开连接（fail the connection）。可选的操作代码如下：
 
+```
 %x0：表示一个延续帧。当 Opcode 为 0 时，表示本次数据传输采用了数据分片，当前收到的数据帧为其中一个数据分片。
 %x1：表示这是一个文本帧（frame）
 %x2：表示这是一个二进制帧（frame）
@@ -129,6 +138,7 @@ Opcode: 4 个比特。
 %xA：表示这是一个 pong 操作。
 %xB-F：保留的操作代码，用于后续定义的控制帧。
 Mask: 1 个比特。
+```
 
 表示是否要对数据载荷进行掩码操作。从客户端向服务端发送数据时，需要对数据进行掩码操作；从服务端向客户端发送数据时，不需要对数据进行掩码操作。
 
@@ -188,7 +198,6 @@ FIN=1 表示当前数据帧为消息的最后一个数据帧，此时接收方�
 此外，opcode在数据交换的场景下，表示的是数据的类型。0x01表示文本，0x02表示二进制。而0x00比较特殊，表示延续帧（continuation frame），顾名思义，就是完整消息对应的数据帧还没接收完。
 
 2. 数据分片例子
-直接看例子更形象些。下面例子来自 MDN ，可以很好地演示数据的分片。客户端向服务端两次发送消息，服务端收到消息后回应客户端，这里主要看客户端往服务端发送的消息。
 
 第一条消息
 
@@ -210,12 +219,9 @@ Client: FIN=1, opcode=0x0, msg="year!"
 Server: (process complete message) Happy new year to you too!
 ```
 ### 五、连接保持 + 心跳
-WebSocket 为了保持客户端、服务端的实时双向通信，需要确保客户端、服务端之间的 TCP 通道保持连接没有断开。然而，对于长时间没有数据往来的连接，如果依旧长时间保持着，可能会浪费包括的连接资源。
 
-但不排除有些场景，客户端、服务端虽然长时间没有数据往来，但仍需要保持连接。这个时候，可以采用心跳来实现。
-
-发送方 -> 接收方：ping
-接收方 -> 发送方：pong
+发送方 -> 接收方：ping (心跳Ping帧包含的操作码是0x9。)
+接收方 -> 发送方：pong (心跳Ping帧包含的操作码是0xA。)
 ping、pong 的操作，对应的是 WebSocket 的两个控制帧，opcode分别是0x9、0xA。
 
 举例，WebSocket 服务端向客户端发送 ping，只需要如下代码（采用ws模块）
@@ -236,72 +242,8 @@ ws.ping('', false, true);
 Sec-WebSocket-Key 主要目的并不是确保数据的安全性，因为 Sec-WebSocket-Key、Sec-WebSocket-Accept 的转换计算公式是公开的，而且非常简单，最主要的作用是预防一些常见的意外情况（非故意的）。
 强调：Sec-WebSocket-Key/Sec-WebSocket-Accept 的换算，只能带来基本的保障，但连接是否安全、数据是否安全、客户端 / 服务端是否合法的 ws 客户端、ws 服务端，其实并没有实际性的保证。
 
-### 七、数据掩码的作用
+### 七、相关链接
 
-WebSocket 协议中，数据掩码的作用是增强协议的安全性。但数据掩码并不是为了保护数据本身，因为算法本身是公开的，运算也不复杂。除了加密通道本身，似乎没有太多有效的保护通信安全的办法。
-
-那么为什么还要引入掩码计算呢，除了增加计算机器的运算量外似乎并没有太多的收益（这也是不少同学疑惑的点）。
-
-答案还是两个字：安全。但并不是为了防止数据泄密，而是为了防止早期版本的协议中存在的代理缓存污染攻击（proxy cache poisoning attacks）等问题。
-
-1. 代理缓存污染攻击
-下面摘自 2010 年关于安全的一段讲话。其中提到了代理服务器在协议实现上的缺陷可能导致的安全问题。猛击出处。
-
-“We show, empirically, that the current version of the WebSocket consent mechanism is vulnerable to proxy cache poisoning attacks. Even though the WebSocket handshake is based on HTTP, which should be understood by most network intermediaries, the handshake uses the esoteric “Upgrade” mechanism of HTTP [5]. In our experiment, we find that many proxies do not implement the Upgrade mechanism properly, which causes the handshake to succeed even though subsequent traffic over the socket will be misinterpreted by the proxy.”
-
-[TALKING] Huang, L-S., Chen, E., Barth, A., Rescorla, E., and C.
-
-Jackson, "Talking to Yourself for Fun and Profit", 2010,
-
-在正式描述攻击步骤之前，我们假设有如下参与者：
-
-攻击者、攻击者自己控制的服务器（简称“邪恶服务器”）、攻击者伪造的资源（简称“邪恶资源”）
-受害者、受害者想要访问的资源（简称“正义资源”）
-受害者实际想要访问的服务器（简称“正义服务器”）
-中间代理服务器
-攻击步骤一：
-
-攻击者浏览器 向 邪恶服务器 发起 WebSocket 连接。根据前文，首先是一个协议升级请求。
-协议升级请求 实际到达 代理服务器。
-代理服务器 将协议升级请求转发到 邪恶服务器。
-邪恶服务器 同意连接，代理服务器 将响应转发给 攻击者。
-由于 upgrade 的实现上有缺陷，代理服务器 以为之前转发的是普通的 HTTP 消息。因此，当协议服务器 同意连接，代理服务器 以为本次会话已经结束。
-
-攻击步骤二：
-
-攻击者 在之前建立的连接上，通过 WebSocket 的接口向 邪恶服务器 发送数据，且数据是精心构造的 HTTP 格式的文本。其中包含了 正义资源 的地址，以及一个伪造的 host（指向正义服务器）。（见后面报文）
-请求到达 代理服务器 。虽然复用了之前的 TCP 连接，但 代理服务器 以为是新的 HTTP 请求。
-代理服务器 向 邪恶服务器 请求 邪恶资源。
-邪恶服务器 返回 邪恶资源。代理服务器 缓存住 邪恶资源（url 是对的，但 host 是 正义服务器 的地址）。
-到这里，受害者可以登场了：
-
-受害者 通过 代理服务器 访问 正义服务器 的 正义资源。
-代理服务器 检查该资源的 url、host，发现本地有一份缓存（伪造的）。
-代理服务器 将 邪恶资源 返回给 受害者。
-受害者 卒。
-附：前面提到的精心构造的“HTTP 请求报文”。
-
-```
-
-Client → Server:
-POST /path/of/attackers/choice HTTP/1.1 Host: host-of-attackers-choice.com Sec-WebSocket-Key: <connection-key>
-Server → Client:
-HTTP/1.1 200 OK
-Sec-WebSocket-Accept: <connection-key>
-```
-2. 当前解决方案
-最初的提案是对数据进行加密处理。基于安全、效率的考虑，最终采用了折中的方案：对数据载荷进行掩码处理。
-
-需要注意的是，这里只是限制了浏览器对数据载荷进行掩码处理，但是坏人完全可以实现自己的 WebSocket 客户端、服务端，不按规则来，攻击可以照常进行。
-
-但是对浏览器加上这个限制后，可以大大增加攻击的难度，以及攻击的影响范围。如果没有这个限制，只需要在网上放个钓鱼网站骗人去访问，一下子就可以在短时间内展开大范围的攻击。
-
-### 十、写在后面
-WebSocket 可写的东西还挺多，比如 WebSocket 扩展。客户端、服务端之间是如何协商、使用扩展的。WebSocket 扩展可以给协议本身增加很多能力和想象空间，比如数据的压缩、加密，以及多路复用等。
-
-篇幅所限，这里先不展开，感兴趣的同学可以留言交流。文章如有错漏，敬请指出。
-
-### 十一、相关链接
 RFC6455：websocket 规范
 
 server-example
