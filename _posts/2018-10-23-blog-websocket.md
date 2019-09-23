@@ -2,97 +2,20 @@
 layout: post
 title: "WebSocket"
 date: 2019-09-22 13:47:57
-img: workflow.jpg 
+img: js-1.png
 category: blog
 tags: [blog]
 ---
 
 ### 一、内容概览
 
-WebSocket 的出现，使得浏览器具备了实时双向通信的能力。本文由浅入深，介绍了 WebSocket 如何建立连接、交换数据的细节，以及数据帧的格式。此外，还简要介绍了针对 WebSocket 的安全攻击，以及协议是如何抵御类似攻击的。
+> WebSocket 的出现，使得浏览器具备了实时双向通信的能力。
+> HTML5 开始提供的一种浏览器与服务器进行全双工通讯的网络技术，属于应用层协议。它基于 TCP 传输协议，并复用 HTTP 的握手通道。
+> 在WebSocket协议中，数据是通过一系列数据帧来进行传输的。为了避免由于网络中介（例如一些拦截代理）客户端必须在它发送到服务器的所有帧中添加掩码（Mask）
+> 无论WebSocket协议是否使用了TLS，帧都需要添加掩码
 
-### 二、什么是 WebSocket
+### 二、如何建立连接
 
-HTML5 开始提供的一种浏览器与服务器进行全双工通讯的网络技术，属于应用层协议。它基于 TCP 传输协议，并复用 HTTP 的握手通道。
-
-对大部分 web 开发者来说，上面这段描述有点枯燥，其实只要记住几点：
-
-WebSocket 可以在浏览器里使用
-支持双向通信
-使用很简单
-1. 有哪些优点
-说到优点，这里的对比参照物是 HTTP 协议，概括地说就是：支持双向通信，更灵活，更高效，可扩展性更好。
-
-支持双向通信，实时性更强。
-更好的二进制支持。
-较少的控制开销。连接创建后，ws 客户端、服务端进行数据交换时，协议控制的数据包头部较小。在不包含头部的情况下，服务端到客户端的包头只有 2~10 字节（取决于数据包长度），客户端到服务端的的话，需要加上额外的 4 字节的掩码。而 HTTP 协议每次通信都需要携带完整的头部。
-支持扩展。ws 协议定义了扩展，用户可以扩展协议，或者实现自定义的子协议。（比如支持自定义压缩算法等）
-对于后面两点，没有研究过 WebSocket 协议规范的同学可能理解起来不够直观，但不影响对 WebSocket 的学习和使用。
-
-2. 需要学习哪些东西
-对网络应用层协议的学习来说，最重要的往往就是连接建立过程、数据交换教程。当然，数据的格式是逃不掉的，因为它直接决定了协议本身的能力。好的数据格式能让协议更高效、扩展性更好。
-
-下文主要围绕下面几点展开：
-
-如何建立连接
-如何交换数据
-数据帧格式
-如何维持连接
-
-### 三、入门例子
-
-在正式介绍协议细节前，先来看一个简单的例子，有个直观感受。例子包括了 WebSocket 服务端、WebSocket 客户端（网页端）。完整代码可以在 这里 找到。
-
-这里服务端用了ws这个库。相比大家熟悉的socket.io，ws实现更轻量，更适合学习的目的。
-
-1. 服务端
-代码如下，监听 8080 端口。当有新的连接请求到达时，打印日志，同时向客户端发送消息。当收到到来自客户端的消息时，同样打印日志。
-```
-var app = require('express')();
-var server = require('http').Server(app);
-var WebSocket = require('ws');
-var wss = new WebSocket.Server({ port: 8080 });
-wss.on('connection', function connection(ws) {
-    console.log('server: receive connection.');
-    ws.on('message', function incoming(message) {
-        console.log('server: received: %s', message);
-    });
-    ws.send('world');
-});
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-});
-app.listen(3000);
-```
-2. 客户端
-代码如下，向 8080 端口发起 WebSocket 连接。连接建立后，打印日志，同时向服务端发送消息。接收到来自服务端的消息后，同样打印日志。
-```
-<script>
-  var ws = new WebSocket('ws://localhost:8080');
-  ws.onopen = function () {
-    console.log('ws onopen');
-    ws.send('from client: hello');
-  };
-  ws.onmessage = function (e) {
-    console.log('ws onmessage');
-    console.log('from server: ' + e.data);
-  };
-</script>
-```
-3. 运行结果
-可分别查看服务端、客户端的日志，这里不展开。
-
-服务端输出：
-```
-server: receive connection.
-server: received hello
-```
-客户端输出：
-```
-client: ws connection is open
-client: received world
-```
-### 四、如何建立连接
 前面提到，WebSocket 复用了 HTTP 的握手通道。具体指的是，客户端通过 HTTP 请求与 WebSocket 服务端协商升级协议。协议升级完成后，后续的数据交换则遵照 WebSocket 的协议。
 
 1. 客户端：申请协议升级
@@ -146,7 +69,8 @@ let secWebSocketAccept = crypto.createHash('sha1')
 console.log(secWebSocketAccept);
 // Oy4NRAQ13jhfONC7bP8dTKb4PTU=
 ```
-### 五、数据帧格式
+
+### 三、数据帧格式
 
 客户端、服务端数据的交换，离不开数据帧格式的定义。因此，在实际讲解数据交换之前，我们先来看下 WebSocket 的数据帧格式。
 
@@ -212,24 +136,22 @@ Mask: 1 个比特。
 
 如果 Mask 是 1，那么在 Masking-key 中会定义一个掩码键（masking key），并用这个掩码键来对数据载荷进行反掩码。所有客户端发送到服务端的数据帧，Mask 都是 1。
 
-掩码的算法、用途在下一小节讲解。
+**Payload length：数据载荷的长度，单位是字节。为 7 位，或 7+16 位，或 1+64 位。**
 
-Payload length：数据载荷的长度，单位是字节。为 7 位，或 7+16 位，或 1+64 位。
-
+```
 假设数 Payload length === x，如果
-
 x 为 0~126：数据的长度为 x 字节。
 x 为 126：后续 2 个字节代表一个 16 位的无符号整数，该无符号整数的值为数据的长度。
 x 为 127：后续 8 个字节代表一个 64 位的无符号整数（最高位为 0），该无符号整数的值为数据的长度。
 此外，如果 payload length 占用了多个字节的话，payload length 的二进制表达采用网络序（big endian，重要的位在前）。
-
-Masking-key：0 或 4 字节（32 位）
+```
+**Masking-key：0 或 4 字节（32 位）**
 
 所有从客户端传送到服务端的数据帧，数据载荷都进行了掩码操作，Mask 为 1，且携带了 4 字节的 Masking-key。如果 Mask 为 0，则没有 Masking-key。
 
 备注：载荷数据的长度，不包括 mask key 的长度。
 
-Payload data：(x+y) 字节
+**Payload data：(x+y) 字节**
 
 载荷数据：包括了扩展数据、应用数据。其中，扩展数据 x 字节，应用数据 y 字节。
 
@@ -252,7 +174,8 @@ j = i MOD 4
 
 transformed-octet-i = original-octet-i XOR masking-key-octet-j
 
-### 六、数据传递
+### 四、数据传递
+
 一旦 WebSocket 客户端、服务端建立连接后，后续的操作都是基于数据帧的传递。
 
 WebSocket 根据opcode来区分操作的类型。比如0x8表示断开连接，0x0-0x2表示数据交互。
@@ -286,7 +209,7 @@ Server: (listening, payload concatenated to previous message)
 Client: FIN=1, opcode=0x0, msg="year!"
 Server: (process complete message) Happy new year to you too!
 ```
-### 七、连接保持 + 心跳
+### 五、连接保持 + 心跳
 WebSocket 为了保持客户端、服务端的实时双向通信，需要确保客户端、服务端之间的 TCP 通道保持连接没有断开。然而，对于长时间没有数据往来的连接，如果依旧长时间保持着，可能会浪费包括的连接资源。
 
 但不排除有些场景，客户端、服务端虽然长时间没有数据往来，但仍需要保持连接。这个时候，可以采用心跳来实现。
@@ -300,7 +223,7 @@ ping、pong 的操作，对应的是 WebSocket 的两个控制帧，opcode分别
 ```
 ws.ping('', false, true);
 ```
-### 八、Sec-WebSocket-Key/Accept 的作用
+### 六、Sec-WebSocket-Key/Accept 的作用
 
 前面提到了，Sec-WebSocket-Key/Sec-WebSocket-Accept在主要作用在于提供基础的防护，减少恶意连接、意外连接。
 
@@ -313,7 +236,7 @@ ws.ping('', false, true);
 Sec-WebSocket-Key 主要目的并不是确保数据的安全性，因为 Sec-WebSocket-Key、Sec-WebSocket-Accept 的转换计算公式是公开的，而且非常简单，最主要的作用是预防一些常见的意外情况（非故意的）。
 强调：Sec-WebSocket-Key/Sec-WebSocket-Accept 的换算，只能带来基本的保障，但连接是否安全、数据是否安全、客户端 / 服务端是否合法的 ws 客户端、ws 服务端，其实并没有实际性的保证。
 
-### 九、数据掩码的作用
+### 七、数据掩码的作用
 
 WebSocket 协议中，数据掩码的作用是增强协议的安全性。但数据掩码并不是为了保护数据本身，因为算法本身是公开的，运算也不复杂。除了加密通道本身，似乎没有太多有效的保护通信安全的办法。
 
