@@ -3,6 +3,7 @@ layout: post
 title: "Mnesia使用结"
 date: 2019-10-10 10:19:57
 category: mnesia
+img: erlang.jpg
 tags: [mnesia]
 ---
 
