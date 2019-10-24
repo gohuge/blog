@@ -33,6 +33,15 @@ tags: [blog]
 
 ### Unity
 - [6个Unity 开源项目分享](https://gameinstitute.qq.com/community/detail/120934)
+- [Unity PostProcess的使用](https://zhuanlan.zhihu.com/p/84434802)
+- [Material与ShareMaterial引用的区别](https://www.cnblogs.com/qiuxiangmuyu/p/5826233.html)
+- [详解UGUI DrawCall计算和Rebuild操作优化](http://note.youdao.com/noteshare?id=3cd5a4025bd46efdb8c56594582a51c7&sub=5533BF33A90541B798857C34C5C23D66)
+- [如何绕过Unity打造自己的HUD UI系统](http://note.youdao.com/noteshare?id=df6fe42229cab5bfb4beb6426d739b49&sub=6E55A92F49914B4B8A94A77CF29D9E69)
+- [自动化规范Unity资源的实践.note](http://note.youdao.com/noteshare?id=857d0ff33411f77ce5c53172f0760642&sub=5EAB26A4CBBC484DA52259A3A5B36E45)
+- [Unity Dotween使用优化，1ms优化](https://zhuanlan.zhihu.com/p/58377954)
+- [Unity AssetBundle高效加密案例分享](https://blog.uwa4d.com/archives/USparkle_AssetBundle.html)
+- [关于炫酷的Unity3D Shader集合](https://github.com/QianMo/Awesome-Unity-Shader)
+- [渲染流水线](https://zhuanlan.zhihu.com/p/26077873)
 
 ### 业务开发
 - [高效寻路算法](https://www.iteye.com/blog/qinysong-678941)
@@ -53,3 +62,5 @@ tags: [blog]
 
 ### 好站推荐
 - [花瓣-美术-设计师](https://huaban.com/)
+- [Pinterest资源收索](https://www.pinterest.com/)
+
