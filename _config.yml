@@ -11,7 +11,7 @@ site-twitter: #if your site has a twitter account, enter it here
 # Author Settings
 author: Gitcall # add your name
 author-img: david-freeman.jpg # add your photo
-about-author: 目标清晰，想方法和行动<br/>做大概率会赢的事情<br/>沟通和表达是最重要的；找不到态度，就回到真诚；没有难以解决的问题，只有难以解决的心态；永远最重要的都是解决当下问题。 # add description
+about-author: 目标清晰，想方法和行动<br/>做大概率会赢的事情<br/>沟通和表达是最重要的<br/>找不到态度，就回到真诚<br/>没有难以解决的问题，只有难以解决的心态<br/>永远最重要的都是解决当下问题 # add description
 social-twitter: # add your Twitter handle
 social-facebook: # add your Facebook handle
 social-github: artemsheludko # add your Github handle
